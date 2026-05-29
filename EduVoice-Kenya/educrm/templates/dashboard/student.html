@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Student Dashboard — EduVoice{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>👋 Welcome back, {{ user.first_name }}!</h1>
+  <p>{% if user.school %}{{ user.school.name }}{% endif %} · {{ enrollment.classroom }} {% if enrollment %}· Grade {{ enrollment.classroom.grade }}{% endif %}</p>
+</div>
+
+{% if semester %}
+<div class="card mb-3" style="border-left: 4px solid var(--accent); background: linear-gradient(135deg, #fffbeb, #fff);">
+  <div class="flex justify-between items-center">
+    <div>
+      <div style="font-size:0.8rem;color:var(--muted);font-weight:600;text-transform:uppercase;">Active Term</div>
+      <div style="font-size:1.1rem;font-weight:700;color:var(--text);margin-top:4px;">{{ semester.name }}</div>
+      {% if semester.review_deadline %}<div style="font-size:0.82rem;color:var(--muted);">Reviews due: {{ semester.review_deadline }}</div>{% endif %}
+    </div>
+    <a href="{% url 'student_review_home' %}" class="btn btn-accent">Start Reviews →</a>
+  </div>
+  <div class="mt-2">
+    <div class="flex justify-between text-sm mb-1">
+      <span>Reviews completed</span>
+      <span style="font-weight:600;">{{ completed_reviews }}/{{ total_reviews }}</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width:{{ progress_pct }}%"></div>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="card mb-3">
+  <div class="empty-state">
+    <div class="icon">📋</div>
+    <p>No review period is open right now. Check back when your school opens the next term review.</p>
+  </div>
+</div>
+{% endif %}
+
+<div class="grid-3 mb-3">
+  <div class="stat-card">
+    <div class="icon">✅</div>
+    <div class="value">{{ completed_reviews }}</div>
+    <div class="label">Reviews Submitted</div>
+  </div>
+  <div class="stat-card">
+    <div class="icon">📚</div>
+    <div class="value">{{ total_reviews }}</div>
+    <div class="label">Subjects This Term</div>
+  </div>
+  <div class="stat-card">
+    <div class="icon">🌟</div>
+    <div class="value">{{ progress_pct }}%</div>
+    <div class="label">Completion Rate</div>
+  </div>
+</div>
+
+{% if past_reviews %}
+<div class="card">
+  <div class="card-header">📝 Recent Reviews</div>
+  <table class="table">
+    <thead><tr><th>Subject</th><th>Term</th><th>Rating</th><th>Submitted</th></tr></thead>
+    <tbody>
+      {% for review in past_reviews %}
+      <tr>
+        <td><strong>{{ review.assignment.subject.name }}</strong></td>
+        <td>{{ review.semester.name }}</td>
+        <td>
+          <span style="color:var(--accent);">
+            {% for i in "12345" %}{% if forloop.counter <= review.average_rating %}⭐{% endif %}{% endfor %}
+          </span>
+          {{ review.average_rating }}/5
+        </td>
+        <td class="text-muted text-sm">{{ review.submitted_at|date:"d M Y" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% block title %}My Feedback — EduVoice{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="flex justify-between items-center">
+    <div>
+      <h1>📊 Student Feedback</h1>
+      <p>Anonymous aggregated responses from your students</p>
+    </div>
+    {% if semesters %}
+    <form method="GET" style="display:flex; gap:0.5rem; align-items:center;">
+      <select name="semester" class="form-control" style="width:auto;" onchange="this.form.submit()">
+        {% for s in semesters %}
+        <option value="{{ s.id }}" {% if semester and s.id == semester.id %}selected{% endif %}>{{ s.name }}</option>
+        {% endfor %}
+      </select>
+    </form>
+    {% endif %}
+  </div>
+</div>
+
+{% if feedback_data %}
+  {% for item in feedback_data %}
+  <div class="card mb-3">
+    <div class="card-header">
+      {{ item.assignment.subject.icon }} {{ item.assignment.subject.name }}
+      <span class="chip chip-blue">{{ item.assignment.classroom }}</span>
+      <span class="chip chip-gray">{{ item.aggregated.count }} responses</span>
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <div style="font-size:0.8rem;font-weight:600;color:var(--muted);text-transform:uppercase;margin-bottom:0.75rem;">Rating Breakdown</div>
+
+        <div class="rating-bar">
+          <div class="rating-bar-label">😄 Lesson Enjoyment</div>
+          <div class="rating-bar-track"><div class="rating-bar-fill" style="width:{% widthratio item.aggregated.avg_enjoyment|default:0 5 100 %}%;"></div></div>
+          <div class="rating-bar-value">{{ item.aggregated.avg_enjoyment|default:0|floatformat:1 }}</div>
+        </div>
+        <div class="rating-bar">
+          <div class="rating-bar-label">🧠 Understanding</div>
+          <div class="rating-bar-track"><div class="rating-bar-fill" style="width:{% widthratio item.aggregated.avg_understanding|default:0 5 100 %}%;"></div></div>
+          <div class="rating-bar-value">{{ item.aggregated.avg_understanding|default:0|floatformat:1 }}</div>
+        </div>
+        <div class="rating-bar">
+          <div class="rating-bar-label">🗣️ Clarity of Teaching</div>
+          <div class="rating-bar-track"><div class="rating-bar-fill" style="width:{% widthratio item.aggregated.avg_explains|default:0 5 100 %}%;"></div></div>
+          <div class="rating-bar-value">{{ item.aggregated.avg_explains|default:0|floatformat:1 }}</div>
+        </div>
+        <div class="rating-bar">
+          <div class="rating-bar-label">🙋 Encourages Questions</div>
+          <div class="rating-bar-track"><div class="rating-bar-fill" style="width:{% widthratio item.aggregated.avg_encourages|default:0 5 100 %}%;"></div></div>
+          <div class="rating-bar-value">{{ item.aggregated.avg_encourages|default:0|floatformat:1 }}</div>
+        </div>
+        <div class="rating-bar">
+          <div class="rating-bar-label">🌍 Real-World Connection</div>
+          <div class="rating-bar-track"><div class="rating-bar-fill" style="width:{% widthratio item.aggregated.avg_realworld|default:0 5 100 %}%;"></div></div>
+          <div class="rating-bar-value">{{ item.aggregated.avg_realworld|default:0|floatformat:1 }}</div>
+        </div>
+      </div>
+
+      <div>
+        {% if item.favourites %}
+        <div style="font-size:0.8rem;font-weight:600;color:var(--muted);text-transform:uppercase;margin-bottom:0.75rem;">⭐ What students loved</div>
+        {% for f in item.favourites|slice:":4" %}
+        <div style="background:#f0fdf4;border-radius:8px;padding:0.6rem 0.9rem;margin-bottom:0.5rem;font-size:0.875rem;border-left:3px solid var(--primary-light);">
+          "{{ f }}"
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {% if item.suggestions %}
+        <div style="font-size:0.8rem;font-weight:600;color:var(--muted);text-transform:uppercase;margin:1rem 0 0.75rem;">💡 Suggestions</div>
+        {% for s in item.suggestions|slice:":3" %}
+        <div style="background:#fffbeb;border-radius:8px;padding:0.6rem 0.9rem;margin-bottom:0.5rem;font-size:0.875rem;border-left:3px solid var(--accent);">
+          "{{ s }}"
+        </div>
+        {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+
+    <hr class="divider">
+    <div class="flex gap-2">
+      <a href="{% url 'teacher_self_assess' item.assignment.classroom.id item.assignment.subject.id %}" class="btn btn-outline btn-sm">
+        {% if self_assessment %}Update My Self-Assessment{% else %}Add My Self-Assessment{% endif %}
+      </a>
+    </div>
+  </div>
+  {% endfor %}
+
+{% else %}
+<div class="card">
+  <div class="empty-state">
+    <div class="icon">📋</div>
+    <p>No student feedback received yet for this term.<br>
+    <span class="text-sm">Reviews will appear here once students submit them.</span></p>
+  </div>
+</div>
+{% endif %}
+
+{% if self_assessment %}
+<div class="card" style="border-left:4px solid var(--primary);">
+  <div class="card-header">📝 My Self-Assessment — {{ semester.name }}</div>
+  <div class="grid-3">
+    <div><div style="font-weight:600;">Syllabus Coverage</div><div style="color:var(--accent);">⭐ {{ self_assessment.coverage }}/5</div></div>
+    <div><div style="font-weight:600;">Student Engagement</div><div style="color:var(--accent);">⭐ {{ self_assessment.student_engagement }}/5</div></div>
+    <div><div style="font-weight:600;">Values Integration</div><div style="color:var(--accent);">⭐ {{ self_assessment.values_integration }}/5</div></div>
+  </div>
+  {% if self_assessment.highlights %}
+  <div class="mt-2"><strong>Highlights:</strong> <span class="text-muted">{{ self_assessment.highlights }}</span></div>
+  {% endif %}
+  {% if self_assessment.next_term_goals %}
+  <div class="mt-1"><strong>Next term goals:</strong> <span class="text-muted">{{ self_assessment.next_term_goals }}</span></div>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

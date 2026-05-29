@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}Self Assessment — {{ subject.name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>📝 My Self-Assessment</h1>
+  <p>{{ subject.name }} · {{ classroom }} · {{ semester.name }}</p>
+</div>
+
+<div style="max-width: 640px;">
+  <div class="card mb-3" style="background:#eff6ff; border-color:#93c5fd;">
+    <p class="text-sm" style="color:#1e40af; line-height:1.6;">
+      💡 <strong>This is for your growth, not your evaluation.</strong> Honest reflection on what went well and what
+      you want to improve is what makes great teachers. Your students' feedback and your own assessment will
+      help you plan next term more intentionally.
+    </p>
+  </div>
+
+  <form method="POST">
+    {% csrf_token %}
+    <div class="card mb-3">
+      <div class="card-header">How did this term go?</div>
+
+      <div class="form-group">
+        <label class="form-label">📚 How much of the syllabus did you cover?</label>
+        <div class="radio-group">
+          {% for val, label in form.coverage.field.widget.choices %}
+          <div><input type="radio" name="coverage" id="cov_{{ val }}" value="{{ val }}" {% if form.coverage.value == val|stringformat:"s" %}checked{% endif %}>
+          <label for="cov_{{ val }}">{{ label }}</label></div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">👦 How engaged were your students overall?</label>
+        <div class="radio-group">
+          {% for val, label in form.student_engagement.field.widget.choices %}
+          <div><input type="radio" name="student_engagement" id="eng_{{ val }}" value="{{ val }}" {% if form.student_engagement.value == val|stringformat:"s" %}checked{% endif %}>
+          <label for="eng_{{ val }}">{{ label }}</label></div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">🌱 How well did you integrate life values and CBC skills into your lessons?</label>
+        <div class="radio-group">
+          {% for val, label in form.values_integration.field.widget.choices %}
+          <div><input type="radio" name="values_integration" id="val_{{ val }}" value="{{ val }}" {% if form.values_integration.value == val|stringformat:"s" %}checked{% endif %}>
+          <label for="val_{{ val }}">{{ label }}</label></div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header">Reflect on your teaching</div>
+      <div class="form-group">
+        <label class="form-label">⭐ What went really well this term?</label>
+        <textarea name="highlights" class="form-control" rows="3" placeholder="A lesson that landed, a student who surprised you, a method that worked...">{{ form.highlights.value|default:'' }}</textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">🔧 What was challenging?</label>
+        <textarea name="challenges" class="form-control" rows="3" placeholder="Content that was hard to teach, engagement issues, time constraints...">{{ form.challenges.value|default:'' }}</textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">🎯 What will you do differently next term?</label>
+        <textarea name="next_term_goals" class="form-control" rows="3" placeholder="One concrete change you want to make...">{{ form.next_term_goals.value|default:'' }}</textarea>
+      </div>
+    </div>
+
+    <div class="flex gap-2">
+      <button type="submit" class="btn btn-primary">Save Assessment ✓</button>
+      <a href="{% url 'teacher_feedback' %}" class="btn btn-outline">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

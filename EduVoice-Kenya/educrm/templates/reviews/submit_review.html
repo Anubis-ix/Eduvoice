@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% block title %}Review: {{ assignment.subject.name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>{{ assignment.subject.icon }} {{ assignment.subject.name }}</h1>
+  <p>Review for {{ assignment.teacher.get_full_name }} · {{ semester.name }}</p>
+</div>
+
+<div style="max-width: 680px;">
+  <div class="card mb-3" style="background:#fffbeb; border-color:#fcd34d;">
+    <p class="text-sm" style="color:#92400e;">
+      🔒 <strong>This is anonymous.</strong> Your teacher will only see the average of all responses — not your individual answers.
+      Be honest. Your feedback helps make lessons better for everyone.
+    </p>
+  </div>
+
+  <form method="POST">
+    {% csrf_token %}
+    <div class="card mb-3">
+      <div class="card-header">How did you feel about this subject?</div>
+
+      <div class="form-group">
+        <label class="form-label">😄 How much did you enjoy {{ assignment.subject.name }} this term?</label>
+        <div class="radio-group">
+          {% for val, label in form.lesson_enjoyment.field.widget.choices %}
+          <div>
+            <input type="radio" name="lesson_enjoyment" id="enj_{{ val }}" value="{{ val }}" {% if form.lesson_enjoyment.value == val|stringformat:"s" %}checked{% endif %}>
+            <label for="enj_{{ val }}">{{ label }}</label>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">🧠 How well did you understand what was taught?</label>
+        <div class="radio-group">
+          {% for val, label in form.understanding.field.widget.choices %}
+          <div>
+            <input type="radio" name="understanding" id="und_{{ val }}" value="{{ val }}">
+            <label for="und_{{ val }}">{{ label }}</label>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">🗣️ How clearly did your teacher explain things?</label>
+        <div class="radio-group">
+          {% for val, label in form.teacher_explains_well.field.widget.choices %}
+          <div>
+            <input type="radio" name="teacher_explains_well" id="exp_{{ val }}" value="{{ val }}">
+            <label for="exp_{{ val }}">{{ label }}</label>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">🙋 How much did your teacher encourage you to ask questions?</label>
+        <div class="radio-group">
+          {% for val, label in form.teacher_encourages.field.widget.choices %}
+          <div>
+            <input type="radio" name="teacher_encourages" id="enc_{{ val }}" value="{{ val }}">
+            <label for="enc_{{ val }}">{{ label }}</label>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">🌍 Did the lessons connect to real life?</label>
+        <div class="radio-group">
+          {% for val, label in form.real_world_connection.field.widget.choices %}
+          <div>
+            <input type="radio" name="real_world_connection" id="rl_{{ val }}" value="{{ val }}">
+            <label for="rl_{{ val }}">{{ label }}</label>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header">In your own words...</div>
+
+      <div class="form-group">
+        <label class="form-label">⭐ What was your favourite thing you learned this term?</label>
+        <textarea name="favourite_thing" class="form-control" rows="3" placeholder="Something cool, surprising, or interesting you learned..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">🔍 What would you love to learn more about?</label>
+        <textarea name="want_to_learn_more" class="form-control" rows="3" placeholder="A topic that made you curious or want to know more..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">💡 One idea to make this subject even better?</label>
+        <textarea name="suggestion" class="form-control" rows="3" placeholder="An activity, approach, or topic you'd suggest..."></textarea>
+      </div>
+    </div>
+
+    <div class="flex gap-2">
+      <button type="submit" class="btn btn-primary">Submit Review ✓</button>
+      <a href="{% url 'student_review_home' %}" class="btn btn-outline">Back</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

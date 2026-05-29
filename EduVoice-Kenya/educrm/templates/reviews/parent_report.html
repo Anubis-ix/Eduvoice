@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block title %}{{ child.first_name }}'s Report — EduVoice{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="flex justify-between items-center">
+    <div>
+      <h1>👨‍👩‍👧 {{ child.get_full_name }}'s Report</h1>
+      <p>{{ semester.name }} · Parent view</p>
+    </div>
+    <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+      {% if children|length > 1 %}
+      <form method="GET" style="display:flex; gap:0.5rem;">
+        {% if semester %}<input type="hidden" name="semester" value="{{ semester.id }}">{% endif %}
+        <select name="child" class="form-control" style="width:auto;" onchange="this.form.submit()">
+          {% for c in children %}
+          <option value="{{ c.id }}" {% if child and c.id == child.id %}selected{% endif %}>{{ c.get_full_name }}</option>
+          {% endfor %}
+        </select>
+      </form>
+      {% endif %}
+      {% if semesters %}
+      <form method="GET" style="display:flex; gap:0.5rem;">
+        {% if child %}<input type="hidden" name="child" value="{{ child.id }}">{% endif %}
+        <select name="semester" class="form-control" style="width:auto;" onchange="this.form.submit()">
+          {% for s in semesters %}
+          <option value="{{ s.id }}" {% if semester and s.id == semester.id %}selected{% endif %}>{{ s.name }}</option>
+          {% endfor %}
+        </select>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% if reviews %}
+<div class="card mb-3">
+  <div class="card-header">📚 Subject Reviews</div>
+  {% for review in reviews %}
+  <div style="padding: 1.25rem 0; border-bottom: 1px solid var(--border);">
+    <div class="flex justify-between items-center mb-2">
+      <div>
+        <strong>{{ review.assignment.subject.icon }} {{ review.assignment.subject.name }}</strong>
+        <span class="text-muted text-sm"> · {{ review.assignment.teacher.get_full_name }}</span>
+      </div>
+      <div style="font-size:1.1rem; color:var(--accent);">
+        ⭐ {{ review.average_rating }}/5
+      </div>
+    </div>
+
+    <div class="grid-2" style="gap:0.75rem;">
+      <div>
+        <div class="rating-bar"><div class="rating-bar-label">Enjoyment</div><div class="rating-bar-track"><div class="rating-bar-fill" style="width:{% widthratio review.lesson_enjoyment 5 100 %}%;"></div></div><div class="rating-bar-value">{{ review.lesson_enjoyment }}</div></div>
+        <div class="rating-bar"><div class="rating-bar-label">Understanding</div><div class="rating-bar-track"><div class="rating-bar-fill" style="width:{% widthratio review.understanding 5 100 %}%;"></div></div><div class="rating-bar-value">{{ review.understanding }}</div></div>
+        <div class="rating-bar"><div class="rating-bar-label">Real-World Link</div><div class="rating-bar-track"><div class="rating-bar-fill" style="width:{% widthratio review.real_world_connection 5 100 %}%;"></div></div><div class="rating-bar-value">{{ review.real_world_connection }}</div></div>
+      </div>
+      <div>
+        {% if review.favourite_thing %}
+        <div style="background:#f0fdf4;border-radius:8px;padding:0.6rem 0.9rem;font-size:0.85rem;border-left:3px solid var(--primary-light); margin-bottom:0.5rem;">
+          <strong>Favourite thing learned:</strong><br>"{{ review.favourite_thing }}"
+        </div>
+        {% endif %}
+        {% if review.want_to_learn_more %}
+        <div style="background:#fffbeb;border-radius:8px;padding:0.6rem 0.9rem;font-size:0.85rem;border-left:3px solid var(--accent);">
+          <strong>Curious about:</strong><br>"{{ review.want_to_learn_more }}"
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% if softskill_ratings %}
+<div class="card mb-3">
+  <div class="card-header">🌟 Values & Skills</div>
+  <div class="grid-2">
+    {% for rating in softskill_ratings %}
+    <div style="padding:0.75rem; background:#f9fafb; border-radius:8px;">
+      <div class="flex justify-between items-center">
+        <span style="font-weight:600;">{{ rating.soft_skill.icon }} {{ rating.soft_skill.name }}</span>
+        <span style="color:var(--accent); font-weight:700;">{{ rating.rating }}/5</span>
+      </div>
+      {% if rating.reflection %}
+      <div class="text-sm text-muted mt-1">"{{ rating.reflection }}"</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<div class="card" style="background:#f0fdf4; border-color:#86efac;">
+  <div class="card-header">💬 Your Note to {{ child.first_name }}</div>
+  <p class="text-sm text-muted mb-2">Your child can see when you've viewed their report. You can leave an encouraging note.</p>
+  <form method="POST" action="{% url 'parent_report' %}">
+    {% csrf_token %}
+    <textarea name="parent_comment" class="form-control" rows="3" placeholder="Write something encouraging for {{ child.first_name }}..."></textarea>
+    <button type="submit" class="btn btn-primary mt-2 btn-sm">Save Note</button>
+  </form>
+</div>
+
+{% else %}
+<div class="card">
+  <div class="empty-state">
+    <div class="icon">📋</div>
+    <p>{{ child.first_name }} hasn't submitted any reviews yet this term.</p>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

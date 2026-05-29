@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}EduVoice Kenya{% endblock %}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1a6b3c;
+      --primary-light: #27a85f;
+      --accent: #e8a020;
+      --red: #c0392b;
+      --bg: #f4f6f9;
+      --card: #ffffff;
+      --text: #1a1a2e;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --shadow: 0 2px 12px rgba(0,0,0,0.08);
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* NAV */
+    .nav { background: var(--primary); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 60px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+    .nav-brand { color: white; font-weight: 700; font-size: 1.2rem; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+    .nav-brand span { background: var(--accent); color: white; border-radius: 6px; padding: 2px 8px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+    .nav-links { display: flex; align-items: center; gap: 1.5rem; }
+    .nav-links a { color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: white; }
+    .nav-user { color: rgba(255,255,255,0.7); font-size: 0.85rem; display: flex; align-items: center; gap: 0.75rem; }
+    .badge-role { background: var(--accent); color: white; padding: 2px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+
+    /* LAYOUT */
+    .page { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
+    .page-header { margin-bottom: 2rem; }
+    .page-header h1 { font-size: 1.75rem; font-weight: 700; color: var(--text); }
+    .page-header p { color: var(--muted); margin-top: 4px; }
+
+    /* CARDS */
+    .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.5rem; border: 1px solid var(--border); }
+    .card-header { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+
+    /* STAT CARDS */
+    .stat-card { background: var(--card); border-radius: var(--radius); padding: 1.25rem; border: 1px solid var(--border); box-shadow: var(--shadow); }
+    .stat-card .value { font-size: 2rem; font-weight: 700; color: var(--primary); }
+    .stat-card .label { font-size: 0.8rem; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+    .stat-card .icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+
+    /* BUTTONS */
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 0.6rem 1.25rem; border-radius: 8px; font-size: 0.9rem; font-weight: 600; border: none; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: #145530; }
+    .btn-accent { background: var(--accent); color: white; }
+    .btn-accent:hover { background: #c98918; }
+    .btn-outline { background: transparent; color: var(--primary); border: 2px solid var(--primary); }
+    .btn-outline:hover { background: var(--primary); color: white; }
+    .btn-sm { padding: 0.4rem 0.9rem; font-size: 0.8rem; }
+    .btn-danger { background: var(--red); color: white; }
+
+    /* FORMS */
+    .form-group { margin-bottom: 1.5rem; }
+    .form-label { display: block; font-size: 0.875rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem; }
+    .form-help { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.5rem; }
+    .form-control { width: 100%; padding: 0.65rem 0.9rem; border: 2px solid var(--border); border-radius: 8px; font-size: 0.95rem; font-family: inherit; transition: border-color 0.2s; background: white; }
+    .form-control:focus { outline: none; border-color: var(--primary); }
+    textarea.form-control { resize: vertical; }
+    .radio-group { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.5rem; }
+    .radio-group input[type=radio] { display: none; }
+    .radio-group label { padding: 0.5rem 1rem; border: 2px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 1.1rem; transition: all 0.2s; }
+    .radio-group input[type=radio]:checked + label { border-color: var(--primary); background: var(--primary); color: white; }
+    .radio-group label:hover { border-color: var(--primary-light); }
+
+    /* PROGRESS */
+    .progress-bar { background: var(--border); border-radius: 99px; height: 10px; overflow: hidden; }
+    .progress-fill { background: var(--primary-light); height: 100%; border-radius: 99px; transition: width 0.5s ease; }
+
+    /* BADGES / CHIPS */
+    .chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+    .chip-green { background: #d1fae5; color: #065f46; }
+    .chip-yellow { background: #fef3c7; color: #92400e; }
+    .chip-red { background: #fee2e2; color: #991b1b; }
+    .chip-blue { background: #dbeafe; color: #1e40af; }
+    .chip-gray { background: #f3f4f6; color: #374151; }
+
+    /* ALERTS */
+    .alert { padding: 0.9rem 1.2rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.9rem; font-weight: 500; }
+    .alert-success { background: #d1fae5; color: #065f46; border-left: 4px solid #10b981; }
+    .alert-warning { background: #fef3c7; color: #92400e; border-left: 4px solid #f59e0b; }
+    .alert-info { background: #dbeafe; color: #1e40af; border-left: 4px solid #3b82f6; }
+    .alert-error { background: #fee2e2; color: #991b1b; border-left: 4px solid #ef4444; }
+
+    /* TABLE */
+    .table { width: 100%; border-collapse: collapse; }
+    .table th { text-align: left; padding: 0.75rem 1rem; font-size: 0.78rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border); }
+    .table td { padding: 0.85rem 1rem; font-size: 0.9rem; border-bottom: 1px solid var(--border); }
+    .table tr:last-child td { border-bottom: none; }
+    .table tr:hover td { background: #f9fafb; }
+
+    /* RATING STARS */
+    .stars { color: var(--accent); font-size: 1.1rem; letter-spacing: 2px; }
+    .rating-bar { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+    .rating-bar-label { font-size: 0.8rem; color: var(--muted); width: 160px; flex-shrink: 0; }
+    .rating-bar-track { flex: 1; background: var(--border); border-radius: 99px; height: 8px; }
+    .rating-bar-fill { height: 100%; border-radius: 99px; background: var(--primary-light); }
+    .rating-bar-value { font-size: 0.85rem; font-weight: 600; color: var(--text); width: 30px; text-align: right; }
+
+    /* MISC */
+    .divider { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+    .text-muted { color: var(--muted); }
+    .text-sm { font-size: 0.85rem; }
+    .mt-1 { margin-top: 0.5rem; } .mt-2 { margin-top: 1rem; } .mt-3 { margin-top: 1.5rem; } .mt-4 { margin-top: 2rem; }
+    .mb-1 { margin-bottom: 0.5rem; } .mb-2 { margin-bottom: 1rem; } .mb-3 { margin-bottom: 1.5rem; }
+    .flex { display: flex; } .items-center { align-items: center; } .justify-between { justify-content: space-between; } .gap-1 { gap: 0.5rem; } .gap-2 { gap: 1rem; }
+    .empty-state { text-align: center; padding: 3rem; color: var(--muted); }
+    .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
+    @media (max-width: 768px) {
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+      .page { padding: 1rem; }
+      .nav { padding: 0 1rem; }
+    }
+  </style>
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+{% if user.is_authenticated %}
+<nav class="nav">
+  <a href="{% url 'dashboard' %}" class="nav-brand">
+    🎓 EduVoice <span>Kenya</span>
+  </a>
+  <div class="nav-links">
+    <a href="{% url 'dashboard' %}">Dashboard</a>
+    {% if user.is_student %}
+      <a href="{% url 'student_review_home' %}">My Reviews</a>
+    {% elif user.is_teacher %}
+      <a href="{% url 'teacher_feedback' %}">Feedback</a>
+    {% elif user.is_parent %}
+      <a href="{% url 'parent_report' %}">Reports</a>
+    {% elif user.is_school_admin %}
+      <a href="{% url 'admin_dashboard' %}">Analytics</a>
+    {% endif %}
+  </div>
+  <div class="nav-user">
+    <span class="badge-role">{{ user.get_role_display }}</span>
+    <span>{{ user.get_full_name }}</span>
+    <a href="{% url 'logout' %}" style="color:rgba(255,255,255,0.6);">Sign out</a>
+  </div>
+</nav>
+{% endif %}
+
+<div class="page">
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+  {% endfor %}
+  {% block content %}{% endblock %}
+</div>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

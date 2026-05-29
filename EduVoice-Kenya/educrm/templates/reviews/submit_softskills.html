@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Skills Reflection — {{ semester.name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>🌟 Values & Skills Reflection</h1>
+  <p>{{ semester.name }} · Rate yourself honestly — this is for your own growth</p>
+</div>
+
+<div style="max-width: 680px;">
+  <div class="card mb-3" style="background: linear-gradient(135deg, #fffbeb, #fff); border-color: #fcd34d;">
+    <p style="font-size:0.95rem; color:#92400e; line-height:1.6;">
+      🌱 <strong>Why does this matter?</strong> Exams measure what you know. This measures who you are becoming.
+      Reading, asking questions, speaking up, and connecting with others are the skills that will shape your whole life —
+      not just your school years.
+    </p>
+  </div>
+
+  <form method="POST">
+    {% csrf_token %}
+    {% for skill in soft_skills %}
+    <div class="card mb-3">
+      <div class="card-header">{{ skill.icon }} {{ skill.name }}</div>
+      <p class="text-sm text-muted mb-2">{{ skill.description }}</p>
+
+      <div class="form-group">
+        <label class="form-label">How would you rate yourself on this skill this term?</label>
+        <div class="radio-group">
+          {% with existing=existing_ratings|default:{} %}
+          {% for i in "12345" %}
+          <div>
+            <input type="radio" name="rating_{{ skill.id }}" id="skill_{{ skill.id }}_{{ forloop.counter }}" value="{{ forloop.counter }}"
+              {% if existing_ratings %}
+                {% for sid, rating in existing_ratings.items %}{% if sid == skill.id %}{% if rating.rating == forloop.counter %}checked{% endif %}{% endif %}{% endfor %}
+              {% endif %}>
+            <label for="skill_{{ skill.id }}_{{ forloop.counter }}">
+              {% if forloop.counter == 1 %}😞 1{% elif forloop.counter == 2 %}😕 2{% elif forloop.counter == 3 %}😐 3{% elif forloop.counter == 4 %}🙂 4{% else %}😄 5{% endif %}
+            </label>
+          </div>
+          {% endfor %}
+          {% endwith %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">How did you practise this skill this term?</label>
+        <textarea name="reflection_{{ skill.id }}" class="form-control" rows="2"
+          placeholder="Give one example of when you used this skill...">{% if existing_ratings %}{% for sid, rating in existing_ratings.items %}{% if sid == skill.id %}{{ rating.reflection }}{% endif %}{% endfor %}{% endif %}</textarea>
+      </div>
+    </div>
+    {% endfor %}
+
+    <div class="flex gap-2">
+      <button type="submit" class="btn btn-accent">Save Reflection 🌟</button>
+      <a href="{% url 'student_review_home' %}" class="btn btn-outline">Back</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

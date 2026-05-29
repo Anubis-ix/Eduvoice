@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register — EduVoice Kenya</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #1a6b3c, #0d3d22); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+    .card { background: white; border-radius: 16px; padding: 2.5rem; width: 100%; max-width: 500px; box-shadow: 0 25px 60px rgba(0,0,0,0.3); }
+    h1 { font-size: 1.5rem; font-weight: 700; color: #1a6b3c; text-align: center; margin-bottom: 0.25rem; }
+    .sub { text-align: center; color: #6b7280; font-size: 0.875rem; margin-bottom: 2rem; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-group { margin-bottom: 1.1rem; }
+    label { display: block; font-size: 0.83rem; font-weight: 600; color: #374151; margin-bottom: 0.35rem; }
+    input, select { width: 100%; padding: 0.65rem 0.9rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 0.9rem; font-family: inherit; transition: border-color 0.2s; }
+    input:focus, select:focus { outline: none; border-color: #1a6b3c; }
+    .alert { padding: 0.75rem 1rem; background: #fee2e2; color: #991b1b; border-radius: 8px; font-size: 0.875rem; margin-bottom: 1rem; }
+    .btn { width: 100%; padding: 0.8rem; background: #1a6b3c; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.2s; margin-top: 0.5rem; }
+    .btn:hover { background: #145530; }
+    .links { text-align: center; margin-top: 1rem; font-size: 0.875rem; color: #6b7280; }
+    .links a { color: #1a6b3c; text-decoration: none; font-weight: 600; }
+    .role-select { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-top: 0.35rem; }
+    .role-select input { display: none; }
+    .role-select label { text-align: center; padding: 0.6rem; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.2s; }
+    .role-select input:checked + label { border-color: #1a6b3c; background: #1a6b3c; color: white; }
+    .role-select label:hover { border-color: #27a85f; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h1>🎓 Create Account</h1>
+  <p class="sub">Join your school on EduVoice Kenya</p>
+
+  {% for message in messages %}
+    <div class="alert">{{ message }}</div>
+  {% endfor %}
+
+  <form method="POST">
+    {% csrf_token %}
+    <div class="grid-2">
+      <div class="form-group">
+        <label>First Name</label>
+        <input type="text" name="first_name" required placeholder="Jane">
+      </div>
+      <div class="form-group">
+        <label>Last Name</label>
+        <input type="text" name="last_name" required placeholder="Wanjiru">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" name="username" required placeholder="jane.wanjiru">
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" name="email" placeholder="jane@school.ac.ke">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" name="password" required placeholder="Create a strong password">
+    </div>
+    <div class="form-group">
+      <label>I am a...</label>
+      <div class="role-select">
+        <div><input type="radio" name="role" id="r_student" value="student" checked><label for="r_student">👦 Student</label></div>
+        <div><input type="radio" name="role" id="r_teacher" value="teacher"><label for="r_teacher">👩‍🏫 Teacher</label></div>
+        <div><input type="radio" name="role" id="r_parent" value="parent"><label for="r_parent">👨‍👩‍👧 Parent</label></div>
+        <div><input type="radio" name="role" id="r_admin" value="admin"><label for="r_admin">🏫 Admin</label></div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>School</label>
+      <select name="school" required>
+        <option value="">— Select your school —</option>
+        {% for school in schools %}
+          <option value="{{ school.id }}">{{ school.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn">Create Account →</button>
+  </form>
+  <div class="links">Already have an account? <a href="{% url 'login' %}">Sign in</a></div>
+</div>
+</body>
+</html>

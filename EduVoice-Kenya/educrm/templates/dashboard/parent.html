@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Parent Dashboard{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>👨‍👩‍👧 Welcome, {{ user.first_name }}!</h1>
+  <p>Parent view · {% if user.school %}{{ user.school.name }}{% endif %}</p>
+</div>
+
+{% if children_data %}
+  {% for item in children_data %}
+  <div class="card mb-3">
+    <div class="card-header">
+      👦 {{ item.child.get_full_name }}
+      {% if item.enrollment %}<span class="chip chip-blue">{{ item.enrollment.classroom }}</span>{% endif %}
+    </div>
+    {% if item.latest_reviews %}
+      <table class="table">
+        <thead><tr><th>Subject</th><th>Term</th><th>Avg Rating</th></tr></thead>
+        <tbody>
+          {% for review in item.latest_reviews %}
+          <tr>
+            <td>{{ review.assignment.subject.name }}</td>
+            <td>{{ review.semester.name }}</td>
+            <td><span style="color:var(--accent);">⭐</span> {{ review.average_rating }}/5</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="mt-2">
+        <a href="{% url 'parent_report' %}?child={{ item.child.id }}" class="btn btn-outline btn-sm">View Full Report →</a>
+      </div>
+    {% else %}
+      <p class="text-muted text-sm">No reviews submitted yet this term.</p>
+    {% endif %}
+  </div>
+  {% endfor %}
+{% else %}
+<div class="card">
+  <div class="empty-state">
+    <div class="icon">👨‍👩‍👧</div>
+    <p>No children linked to your account yet. Please contact your school admin to link your child.</p>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
